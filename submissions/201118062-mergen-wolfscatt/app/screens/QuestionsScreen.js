@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import PrimaryButton from "../components/PrimaryButton";
 import ProgressDots from "../components/ProgressDots";
@@ -20,15 +20,22 @@ export default function QuestionsScreen({
   const currentQuestion = questions[currentIndex];
   const currentValue = answers[currentQuestion.id] || "";
   const isLastQuestion = currentIndex === questions.length - 1;
+  const progressText = `${currentIndex + 1}/${questions.length}`;
 
-  const progressText = useMemo(
-    () => `${currentIndex + 1} / ${questions.length} soru`,
-    [currentIndex, questions.length]
-  );
+  const handleAnswerChange = (value) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQuestion.id]: value
+    }));
+
+    if (error) {
+      setError("");
+    }
+  };
 
   const handleNext = () => {
     if (!currentValue.trim()) {
-      setError("Devam etmek için bu soruya kısa bir cevap yaz.");
+      setError("Devam etmek için bu soruya bir cevap yaz.");
       return;
     }
 
@@ -59,7 +66,7 @@ export default function QuestionsScreen({
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.caption}>Fikirin yakalandı</Text>
+          <Text style={styles.caption}>Takip soruları</Text>
           <Text style={styles.ideaText}>{idea}</Text>
         </View>
 
@@ -71,37 +78,31 @@ export default function QuestionsScreen({
 
           <Text style={styles.questionTitle}>{currentQuestion.title}</Text>
           <Text style={styles.questionHint}>
-            Kısa ve net yazman yeterli. Amaç uzun açıklama değil, spec için doğru çerçeveyi kurmak.
+            Kısa ve net yazman yeterli. Amaç, fikri daha net bir ürün çerçevesine oturtmak.
           </Text>
 
           <TextAreaField
             value={currentValue}
-            onChangeText={(value) => {
-              setAnswers((prev) => ({
-                ...prev,
-                [currentQuestion.id]: value
-              }));
-
-              if (error) {
-                setError("");
-              }
-            }}
+            onChangeText={handleAnswerChange}
             placeholder={currentQuestion.placeholder}
             error={error}
-            minHeight={160}
+            minHeight={150}
           />
 
           <View style={styles.buttonRow}>
             <View style={styles.buttonItem}>
               <PrimaryButton
-                title={currentIndex === 0 ? "Başa Dön" : "Geri"}
+                title={currentIndex === 0 ? "Geri Dön" : "Geri"}
                 variant="ghost"
                 onPress={handlePrevious}
               />
             </View>
 
             <View style={styles.buttonItem}>
-              <PrimaryButton title={isLastQuestion ? "Spec Oluştur" : "Devam"} onPress={handleNext} />
+              <PrimaryButton
+                title={isLastQuestion ? "Özeti Oluştur" : "İleri"}
+                onPress={handleNext}
+              />
             </View>
           </View>
         </SectionCard>
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg
   },
   progressText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "700",
     color: colors.textMuted
   },

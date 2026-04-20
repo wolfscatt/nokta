@@ -1,23 +1,23 @@
 export const FOLLOW_UP_QUESTIONS = [
   {
     id: "problem",
-    title: "Hangi problemi çözüyorsun?",
-    placeholder: "Kullanıcının bugün yaşadığı somut problemi kısa yaz."
+    title: "Bu fikir hangi problemi çözüyor?",
+    placeholder: "Kullanıcının yaşadığı temel problemi kısa şekilde yaz."
   },
   {
     id: "user",
-    title: "Bu ürün en çok kim için?",
-    placeholder: "Ana hedef kullanıcıyı tek cümleyle tarif et."
+    title: "Hedef kullanıcı kim?",
+    placeholder: "Bu ürünü en çok kimin kullanacağını yaz."
   },
   {
     id: "scope",
-    title: "İlk sürümde ne olmalı?",
-    placeholder: "MVP'de mutlaka bulunması gereken 1-3 özelliği yaz."
+    title: "İlk sürümde hangi özellik mutlaka olmalı?",
+    placeholder: "MVP için vazgeçilmez özelliği veya özellikleri yaz."
   },
   {
     id: "constraint",
-    title: "En büyük kısıt veya risk ne?",
-    placeholder: "Zaman, veri, teknik zorluk veya davranışsal risk gibi bir sınırı yaz."
+    title: "En büyük kısıt veya risk nedir?",
+    placeholder: "Zaman, veri, teknik zorluk veya davranışsal risk gibi ana sınırı yaz."
   }
 ];
 
