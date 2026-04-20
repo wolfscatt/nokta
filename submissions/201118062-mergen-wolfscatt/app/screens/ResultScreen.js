@@ -26,14 +26,14 @@ function SpecSection({ title, children }) {
   );
 }
 
-export default function ResultScreen({ idea, spec, onRestart, onBackToQuestions }) {
+export default function ResultScreen({ spec, onRestart, onBackToQuestions }) {
   if (!spec) {
     return (
       <View style={styles.emptyContainer}>
         <SectionCard>
-          <Text style={styles.emptyTitle}>Henüz spec oluşturulmadı</Text>
+          <Text style={styles.emptyTitle}>Henüz sonuç oluşturulmadı</Text>
           <Text style={styles.emptyText}>
-            Önce fikir girip soru akışını tamamladığında bu ekranda ürün özeti görünecek.
+            Önce fikir girişini ve 4 soruluk akışı tamamladığında burada ürün özeti görünecek.
           </Text>
           <PrimaryButton title="Başa Dön" onPress={onRestart} />
         </SectionCard>
@@ -44,18 +44,23 @@ export default function ResultScreen({ idea, spec, onRestart, onBackToQuestions 
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.caption}>Tek sayfalık ürün özeti</Text>
-        <Text style={styles.title}>{spec.title}</Text>
-        <Text style={styles.subtitle}>{spec.summary}</Text>
+        <Text style={styles.caption}>Nokta Capture sonucu</Text>
+        <Text style={styles.title}>Tek sayfalık ürün özeti</Text>
+        <Text style={styles.subtitle}>
+          Fikir ve verdiğin cevaplar birleştirilerek okunabilir bir başlangıç spec'i oluşturuldu.
+        </Text>
       </View>
 
       <SectionCard style={styles.highlightCard}>
-        <Text style={styles.badge}>{spec.category}</Text>
-        <Text style={styles.highlightTitle}>Ham fikir</Text>
-        <Text style={styles.highlightText}>{idea}</Text>
+        <Text style={styles.highlightLabel}>Hazır özet</Text>
+        <Text style={styles.highlightText}>{spec.ideaSummary}</Text>
       </SectionCard>
 
       <SectionCard>
+        <SpecSection title="Fikir özeti">
+          <Text style={styles.bodyText}>{spec.ideaSummary}</Text>
+        </SpecSection>
+
         <SpecSection title="Problem">
           <Text style={styles.bodyText}>{spec.problem}</Text>
         </SpecSection>
@@ -64,20 +69,16 @@ export default function ResultScreen({ idea, spec, onRestart, onBackToQuestions 
           <Text style={styles.bodyText}>{spec.targetUser}</Text>
         </SpecSection>
 
-        <SpecSection title="Değer önerisi">
-          <Text style={styles.bodyText}>{spec.valueProposition}</Text>
-        </SpecSection>
-
         <SpecSection title="MVP kapsamı">
-          <BulletList items={spec.mvpItems.length ? spec.mvpItems : ["Tek temel kullanıcı akışı ile başlanmalı"]} />
+          <BulletList items={spec.mvpItems} />
         </SpecSection>
 
         <SpecSection title="Kısıt / risk">
           <Text style={styles.bodyText}>{spec.constraints}</Text>
         </SpecSection>
 
-        <SpecSection title="İlk başarı sinyali">
-          <Text style={styles.bodyText}>{spec.successMetric}</Text>
+        <SpecSection title="Önerilen ilk adım">
+          <Text style={styles.bodyText}>{spec.firstStep}</Text>
         </SpecSection>
       </SectionCard>
 
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   highlightCard: {
     backgroundColor: "#F9FBFF"
   },
-  badge: {
+  highlightLabel: {
     alignSelf: "flex-start",
     backgroundColor: colors.primarySoft,
     color: colors.primary,
@@ -127,12 +128,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     marginBottom: spacing.sm
-  },
-  highlightTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 6
   },
   highlightText: {
     fontSize: 16,

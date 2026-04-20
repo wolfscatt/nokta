@@ -1,12 +1,5 @@
-const CATEGORY_RULES = [
-  { label: "Eğitim", keywords: ["öğrenci", "ders", "kampüs", "okul", "sınav"] },
-  { label: "Üretkenlik", keywords: ["plan", "not", "takvim", "görev", "ekip"] },
-  { label: "Sağlık", keywords: ["doktor", "sağlık", "hasta", "spor", "uyku"] },
-  { label: "Finans", keywords: ["ödeme", "bütçe", "para", "finans", "harcama"] }
-];
-
 function normalizeText(value) {
-  return value.trim().replace(/\s+/g, " ");
+  return (value || "").trim().replace(/\s+/g, " ");
 }
 
 function toSentence(value) {
@@ -22,77 +15,57 @@ function toSentence(value) {
   return /[.!?]$/.test(cleaned) ? `${first}${rest}` : `${first}${rest}.`;
 }
 
-function detectCategory(idea) {
-  const lowerIdea = idea.toLocaleLowerCase("tr-TR");
-
-  for (const rule of CATEGORY_RULES) {
-    if (rule.keywords.some((keyword) => lowerIdea.includes(keyword))) {
-      return rule.label;
-    }
-  }
-
-  return "Genel Ürün";
-}
-
-function buildTitle(idea, category) {
-  const cleaned = normalizeText(idea);
-
-  if (!cleaned) {
-    return "Yeni Ürün Fikri";
-  }
-
-  const shortTitle = cleaned.length > 42 ? `${cleaned.slice(0, 42).trim()}...` : cleaned;
-  return `${category}: ${shortTitle}`;
-}
-
 function buildMvpList(scopeAnswer) {
-  return normalizeText(scopeAnswer)
+  const parsed = normalizeText(scopeAnswer)
     .split(/,|;|\n/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 3);
+
+  if (parsed.length > 0) {
+    return parsed;
+  }
+
+  return ["Tek ana kullanıcı akışı", "Basit giriş ve çıktı ekranı"];
 }
 
-function buildSuccessMetric(userAnswer) {
-  const lowered = userAnswer.toLocaleLowerCase("tr-TR");
+function buildIdeaSummary(idea, user, problem) {
+  return `${toSentence(idea)} Bu ürün, ${user.toLocaleLowerCase(
+    "tr-TR"
+  )} için ${problem.toLocaleLowerCase("tr-TR")} problemini daha net ve odaklı bir MVP'ye dönüştürmeyi hedefler.`;
+}
 
-  if (lowered.includes("öğrenci")) {
-    return "İlk hafta içinde öğrencilerin uygulamayı tekrar açma oranını görmek";
+function buildFirstStep(user, scope, constraint) {
+  const loweredConstraint = constraint.toLocaleLowerCase("tr-TR");
+
+  if (loweredConstraint.includes("veri")) {
+    return "İlk adım olarak veri kaynağının nasıl sağlanacağını ve MVP'de hangi verinin gerçekten gerekli olduğunu netleştir.";
   }
 
-  if (lowered.includes("ekip") || lowered.includes("çalışan")) {
-    return "Kullanıcıların haftalık aktif kullanım davranışını ölçmek";
+  if (loweredConstraint.includes("zaman")) {
+    return "İlk adım olarak kapsamı tek ana kullanıcı akışına indir ve 1 haftada gösterilebilecek demo senaryosunu seç.";
   }
 
-  return "Kullanıcının ilk akıştan sonra ürünü tekrar kullanma ihtiyacını doğrulamak";
+  if (loweredConstraint.includes("teknik")) {
+    return "İlk adım olarak en riskli teknik parçayı küçük bir prototiple doğrula ve geri kalan akışı buna göre sadeleştir.";
+  }
+
+  return `${user} için "${scope}" odağında küçük bir demo akışı çıkar ve en kritik varsayımı erken test et.`;
 }
 
 export function generateSpec(idea, answers) {
   const safeIdea = normalizeText(idea);
-  const safeAnswers = {
-    problem: normalizeText(answers.problem),
-    user: normalizeText(answers.user),
-    scope: normalizeText(answers.scope),
-    constraint: normalizeText(answers.constraint)
-  };
-
-  const category = detectCategory(safeIdea);
-  const mvpItems = buildMvpList(safeAnswers.scope);
-  const title = buildTitle(safeIdea, category);
+  const safeProblem = normalizeText(answers.problem);
+  const safeUser = normalizeText(answers.user);
+  const safeScope = normalizeText(answers.scope);
+  const safeConstraint = normalizeText(answers.constraint);
 
   return {
-    title,
-    category,
-    summary: `${toSentence(safeIdea)} Bu fikir ${safeAnswers.user.toLocaleLowerCase(
-      "tr-TR"
-    )} için daha net ve uygulanabilir bir ürün çerçevesine dönüştürüldü.`,
-    problem: toSentence(safeAnswers.problem),
-    targetUser: toSentence(safeAnswers.user),
-    mvpItems,
-    constraints: toSentence(safeAnswers.constraint),
-    valueProposition: `${safeAnswers.user} için ${safeAnswers.problem.toLocaleLowerCase(
-      "tr-TR"
-    )} problemini daha az sürtünmeyle çözmeyi hedefleyen odaklı bir mobil deneyim.`,
-    successMetric: buildSuccessMetric(safeAnswers.user)
+    ideaSummary: buildIdeaSummary(safeIdea, safeUser, safeProblem),
+    problem: toSentence(safeProblem),
+    targetUser: toSentence(safeUser),
+    mvpItems: buildMvpList(safeScope),
+    constraints: toSentence(safeConstraint),
+    firstStep: buildFirstStep(safeUser, safeScope, safeConstraint)
   };
 }

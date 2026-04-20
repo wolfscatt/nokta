@@ -8,9 +8,10 @@ export default function LoadingScreen({ idea }) {
     <View style={styles.container}>
       <SectionCard style={styles.card}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.title}>Spec hazırlanıyor</Text>
+        <Text style={styles.title}>Özet hazırlanıyor</Text>
         <Text style={styles.text}>
-          "{idea}" fikri için cevapların birleştiriliyor ve tek sayfalık ürün özeti oluşturuluyor.
+          "{idea}" fikri için verdiğin cevaplar birleştiriliyor ve tek sayfalık ürün özeti
+          oluşturuluyor.
         </Text>
       </SectionCard>
     </View>
